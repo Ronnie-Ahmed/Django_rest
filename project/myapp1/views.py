@@ -7,11 +7,16 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import mixins
 from rest_framework import generics
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
 
 class SnippestList(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self,request,*args,**kwargs):
         snippet=Snippets.objects.all()
         serializers=SnippetSerializer(snippet,many=True)
@@ -26,6 +31,9 @@ class SnippestList(APIView):
 
 
 class SnippetDetails(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get_object(self,pk):
         try:
             snippet=Snippets.objects.get(pk=pk)
@@ -53,8 +61,13 @@ class SnippetDetails(APIView):
         
 
 class SnippestModelGenerics(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView):
+    
+    
     queryset=Snippets.objects.all()
     serializer_class = SnippetSerializer
+    
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self,request,*args,**kwargs):
         return self.list(request,*args,**kwargs)
@@ -65,8 +78,11 @@ class SnippestModelGenerics(mixins.ListModelMixin,mixins.CreateModelMixin,generi
     
     
 class SnippestModelDetailsGenerics(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
+    
     queryset=Snippets.objects.all()
     serializer_class = SnippetSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self,request,*args,**kwargs):
         return self.retrieve(request,*args,**kwargs)
